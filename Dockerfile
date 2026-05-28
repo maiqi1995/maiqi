@@ -1,19 +1,15 @@
-# 使用官方镜像
+# 使用官方 LiteLLM 镜像，确保环境稳定
 FROM ghcr.io/berriai/litellm:main-latest
 
 # 设置工作目录
 WORKDIR /app
 
-# 将本地配置文件复制到容器的 /app 目录下
+# 确保配置文件被正确复制
 COPY config.yaml /app/config.yaml
 
-# 暴露 LiteLLM Proxy 默认端口
+# 暴露端口，Railway 会自动识别
 EXPOSE 4000
 
-# 使用环境变量形式启动，确保 LiteLLM 能正确识别并读取配置
-# --config 指定配置文件
-# --port 指定端口
-# --host 设置为 0.0.0.0 以便 Railway 正确映射
-# 增加 --telemetry False 以减少不必要的外部请求，提升响应速度
-ENTRYPOINT ["litellm"]
-CMD ["--config", "/app/config.yaml", "--port", "4000", "--host", "0.0.0.0", "--telemetry", "False"]
+# 启动命令：这里去掉了 --start，因为新版镜像在检测到 config 时会自动进入 server 模式
+# telemetry 设为 False 可以避免启动时的网络延迟校验
+CMD ["litellm", "--config", "/app/config.yaml", "--port", "4000", "--host", "0.0.0.0", "--telemetry", "False"]
